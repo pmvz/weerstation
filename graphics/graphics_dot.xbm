@@ -1,0 +1,4 @@
+#define graphics_dot_width 2
+#define graphics_dot_height 2
+static unsigned char graphics_dot_bits[] = {
+   0x03, 0x03 };
