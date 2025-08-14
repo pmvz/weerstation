@@ -1,21 +1,14 @@
 #include <SPI.h>
 #include "settings.h"
-#include "Adafruit_ThinkInk.h"
 //#include "display.h"
 #include <SensirionI2cScd4x.h>
 #include "graphics.h"
+#include "drawing.h"
 
-ThinkInk_290_Tricolor_Z94 display(PIN_EPD_DC, PIN_EPD_RESET, PIN_EPD_CS, -1, PIN_EPD_BUSY);
 SensirionI2cScd4x sensorCO2;
 static char errorMessage[64];
 static int16_t error;
 unsigned long last_update_time;
-
-
-void drawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint32_t color)
-{
-    display.drawLine(x1, y1, x2, y2, (uint16_t)color);
-}
 
 
 void PrintUint64(uint64_t& value) {
@@ -76,25 +69,11 @@ void setup() {
         return;
     }
 
-    display.begin(THINKINK_TRICOLOR);
-    display.clearBuffer();
-    drawInfo(7890, 12.3, 45.6);
-    display.display();
+    initDisplay();
+    struct Cursor cursor = { 20, 20 };
+    drawInfo(1234, 12.3, 45.6, 5678);
+    show();
     last_update_time = millis();
-}
-
-
-void drawInfo(int co2Concentration, float temperature, float relativeHumidity)
-{
-    struct Cursor cursor = { 0, 0 };
-
-    // Time
-    cursor = { 31, 36 };
-
-
-    //drawNumberFloat(cursor, temperature);
-    //drawNumberInt(cursor, round(relativeHumidity));
-    //drawNumberInt(co2Concentration, cursor);
 }
 
 
@@ -148,7 +127,7 @@ void loop()
     Serial.println();
 
     // Display results
-    display.clearBuffer();
-    drawInfo(co2Concentration, temperature, relativeHumidity);
-    display.display();
+    clear();
+    drawInfo(co2Concentration, temperature, relativeHumidity, 1000);
+    show();
 }
