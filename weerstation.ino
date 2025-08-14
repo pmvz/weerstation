@@ -83,79 +83,18 @@ void setup() {
     last_update_time = millis();
 }
 
-struct Cursor { int x; int y; };
-
-void drawBitmap(struct Cursor &cursor, struct Bitmap bitmap)
-{
-    display.drawXBitmap(cursor.x, cursor.y,
-                        bitmap.bits, bitmap.width, bitmap.height,
-                        EPD_BLACK);
-}
 
 void drawInfo(int co2Concentration, float temperature, float relativeHumidity)
 {
     struct Cursor cursor = { 0, 0 };
-    struct Bitmap bitmap;
 
-    // Temperature
-    cursor = { 6, 4 };
-    drawBitmap(cursor, getIconBitmap("temp"));
-    cursor.x = 29;
-    drawNumberFloat(cursor, temperature);
-    cursor.x = 82;
-    drawBitmap(cursor, getTextBitmap("degc"));
-
-    // Humidity
-    cursor = { 6, 34 };
-    drawBitmap(cursor, getIconBitmap("rh"));
-    cursor = { 29, 30 };
-    drawNumberInt(cursor, round(relativeHumidity));
-    cursor.x += 3;
-    drawBitmap(cursor, getTextBitmap("percent"));
-    cursor.x = 93;
-    drawBitmap(cursor, getTextBitmap("rh"));
-
-    // CO2
-    cursor = { 3, 55 };
-    drawBitmap(cursor, getIconBitmap("co2"));
-    cursor.x = 29;
-    drawNumberInt(cursor, co2Concentration);
-    cursor.x = 93;
-    cursor.y += 6;
-    drawBitmap(cursor, getTextBitmap("ppm"));
-}
- 
-
-void drawNumberInt(struct Cursor &cursor, int number)
-{
-    struct Bitmap bitmap;
-    char buffer[8];
-    int ret = snprintf(buffer, sizeof(buffer), "%d", number);
-
-    for (int i = 0; i < ret; i++)
-    {
-        bitmap = getNumberBitmap(buffer[i]);
-        drawBitmap(cursor, bitmap);
-        cursor.x = cursor.x + bitmap.width + 3;
-    }
-}
+    // Time
+    cursor = { 31, 36 };
 
 
-void drawNumberFloat(struct Cursor &cursor, float number)
-{
-    struct Bitmap bitmap;
-    char buffer[8];
-    int ret = snprintf(buffer, sizeof(buffer), "%.1f", number);
-
-    for (int i = 0; i < ret; i++)
-    {
-        bitmap = getNumberBitmap(buffer[i]);
-        int offset = (buffer[i] == '.') ? (graphics_0_height - graphics_dot_height) : 0;  // correct dot height
-        cursor.y += offset;
-        drawBitmap(cursor, bitmap);
-        cursor.y -= offset;
-        cursor.x += bitmap.width + 3;
-    }
+    //drawNumberFloat(cursor, temperature);
+    //drawNumberInt(cursor, round(relativeHumidity));
+    //drawNumberInt(co2Concentration, cursor);
 }
 
 

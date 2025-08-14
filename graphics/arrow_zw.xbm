@@ -1,0 +1,4 @@
+#define arrow_zw_width 6
+#define arrow_zw_height 6
+static unsigned char arrow_zw_bits[] = {
+   0x20, 0x10, 0x09, 0x05, 0x01, 0x0f };

@@ -1,0 +1,4 @@
+#define arrow_w_width 7
+#define arrow_w_height 5
+static unsigned char arrow_w_bits[] = {
+   0x04, 0x02, 0x79, 0x02, 0x04 };

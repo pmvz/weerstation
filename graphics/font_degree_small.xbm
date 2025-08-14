@@ -1,0 +1,4 @@
+#define font_degree_small_width 4
+#define font_degree_small_height 10
+static unsigned char font_degree_small_bits[] = {
+   0x06, 0x09, 0x09, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
