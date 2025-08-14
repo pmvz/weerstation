@@ -14,22 +14,28 @@ void drawBitmap(struct Bitmap bitmap, struct Cursor &cursor)
 void drawStringLarge(char* string, struct Cursor &cursor)
 {
     int i = 0;
+    char buffer[2] = "\0";
     while (string[i] != '\0')
     {
-        struct Bitmap bitmap = getBitmapLarge(string[i]);
+        buffer[0] = string[i];
+        struct Bitmap bitmap = getBitmapLarge(buffer);
         drawBitmap(bitmap, { cursor.x, cursor.y + FONT_LARGE_BASELINE });
         cursor.x += bitmap.width + FONT_LARGE_PADDING;
+        i++;
     }
 }
 
 void drawStringSmall(char* string, struct Cursor &cursor)
 {
     int i = 0;
+    char buffer[2] = "\0";
     while (string[i] != '\0')
     {
-        struct Bitmap bitmap = getBitmapSmall(string[i]);
+        buffer[0] = string[i];
+        struct Bitmap bitmap = getBitmapSmall(buffer);
         drawBitmap(bitmap, cursor);
         cursor.x += bitmap.width + FONT_SMALL_PADDING;
+        i++;
     }
 }
 

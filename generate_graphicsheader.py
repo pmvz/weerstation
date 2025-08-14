@@ -53,7 +53,7 @@ for path in paths_fontlarge:
         bitsname = file.readline().split(" ")[3][:-2]
         name = getname(widthname.split("_")[1])
 
-    output += f"    {{ '{name}', {bitsname}, {widthname}, {heightname} }},\n"
+    output += f"    {{ \"{name}\", {bitsname}, {widthname}, {heightname} }},\n"
 
 output = output[:-2] + "\n};\n\n"
 
@@ -67,7 +67,7 @@ for path in paths_fontsmall:
         bitsname = file.readline().split(" ")[3][:-2]
         name = getname(widthname.split("_")[1])
 
-    output += f"    {{ '{name}', {bitsname}, {widthname}, {heightname} }},\n"
+    output += f"    {{ \"{name}\", {bitsname}, {widthname}, {heightname} }},\n"
 
 output = output[:-2] + "\n};\n\n"
 
@@ -81,26 +81,26 @@ for path in paths_icons:
         bitsname = file.readline().split(" ")[3][:-2]
         name = getname(widthname.split("_")[1])
 
-    output += f"    {{ '{name}', {bitsname}, {widthname}, {heightname} }},\n"
+    output += f"    {{ \"{name}\", {bitsname}, {widthname}, {heightname} }},\n"
 
 output = output[:-2] + "\n};\n\n"
 
 
 # Add search functions
 output += f"""
-Bitmap getBitmapLarge(char character)
+Bitmap getBitmapLarge(char* name)
 {{
     for (int i = 0; i < {len(paths_fontlarge)}; i++)
-        if (strcmp(character, font_large[i].name) == 0)
+        if (strcmp(name, font_large[i].name) == 0)
             return font_large[i];
 }}
 """
 
 output += f"""
-Bitmap getBitmapSmall(char character)
+Bitmap getBitmapSmall(char* name)
 {{
     for (int i = 0; i < {len(paths_fontsmall)}; i++)
-        if (strcmp(character, font_small[i].name) == 0)
+        if (strcmp(name, font_small[i].name) == 0)
             return font_small[i];
 }}
 """
