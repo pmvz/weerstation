@@ -8,7 +8,7 @@ bitmap_name_overrides = {  # filename -> preferred name
     "percent": "%",
     "dot": ".",
     "colon": ":",
-    "degree": "°",
+    "degree": "`",
     "dash": "-"
 }
 
@@ -30,10 +30,10 @@ output += """
 output += """\n
 struct Bitmap
 {
-    unsigned char* name;
-    unsigned char* bits;
-    int width;
-    int height;
+    const char* name;
+    const unsigned char* bits;
+    const width;
+    const height;
 };\n\n"""
 
 

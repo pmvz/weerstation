@@ -93,10 +93,10 @@
 
 struct Bitmap
 {
-    unsigned char* name;
-    unsigned char* bits;
-    int width;
-    int height;
+    const char* name;
+    const unsigned char* bits;
+    const int width;
+    const int height;
 };
 
 const Bitmap font_large[40] = 
@@ -119,7 +119,7 @@ const Bitmap font_large[40] =
     { "R", font_R_large_bits, font_R_large_width, font_R_large_height },
     { ":", font_colon_large_bits, font_colon_large_width, font_colon_large_height },
     { "c", font_c_large_bits, font_c_large_width, font_c_large_height },
-    { "°", font_degree_large_bits, font_degree_large_width, font_degree_large_height },
+    { "`", font_degree_large_bits, font_degree_large_width, font_degree_large_height },
     { ".", font_dot_large_bits, font_dot_large_width, font_dot_large_height },
     { "d", font_d_large_bits, font_d_large_width, font_d_large_height },
     { "e", font_e_large_bits, font_e_large_width, font_e_large_height },
@@ -158,7 +158,7 @@ const Bitmap font_small[17] =
     { "b", font_b_small_bits, font_b_small_width, font_b_small_height },
     { "C", font_C_small_bits, font_C_small_width, font_C_small_height },
     { "-", font_dash_small_bits, font_dash_small_width, font_dash_small_height },
-    { "°", font_degree_small_bits, font_degree_small_width, font_degree_small_height },
+    { "`", font_degree_small_bits, font_degree_small_width, font_degree_small_height },
     { "f", font_f_small_bits, font_f_small_width, font_f_small_height },
     { "m", font_m_small_bits, font_m_small_width, font_m_small_height },
     { "t", font_t_small_bits, font_t_small_width, font_t_small_height }
