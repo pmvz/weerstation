@@ -1,14 +1,20 @@
+#include <Arduino.h>
 #include <SPI.h>
-#include "settings.h"
-//#include "display.h"
 #include <SensirionI2cScd4x.h>
+#include <time.h>
+#include <WiFi.h>
+#include <Wire.h>
+#include "settings.h"
 #include "graphics.h"
 #include "drawing.h"
+#include "weather.h"
+
 
 SensirionI2cScd4x sensorCO2;
 static char errorMessage[64];
 static int16_t error;
 unsigned long last_update_time;
+static struct tm datetime;
 
 
 void PrintUint64(uint64_t& value) {
@@ -69,10 +75,26 @@ void setup() {
         return;
     }
 
+    // Init wifi
+    WiFi.mode(WIFI_MODE_STA);
+    WiFi.begin(wifi_ssid, wifi_pass);
+    Serial.print("Connecting to network ..");
+    while (WiFi.status() != WL_CONNECTED) {
+        Serial.print('.');
+        delay(1000);
+    }
+    Serial.print(" Connected! IP: ");
+    Serial.println(WiFi.localIP());
+    
+    delay(1000);
+    retrieveWeatherData();
+    datetime = getDateTime();
+    
+    char datetime_s[64];
+    strftime(datetime_s, sizeof(datetime_s), "%T %w %d %b", &datetime);
+
+    // Init display
     initDisplay();
-    struct Cursor cursor = { 20, 20 };
-    drawInfo(1234, 12.3, 45.6, 5678);
-    show();
     last_update_time = millis();
 }
 
@@ -80,7 +102,7 @@ void setup() {
 void loop()
 {
     unsigned long current_time = millis();
-    if (current_time - last_update_time < UPDATE_INTERVAL)
+    if (current_time - last_update_time < INTERVAL_MEASUREMENT)
     {
         delay(500);
         return;
@@ -99,6 +121,7 @@ void loop()
         Serial.println(errorMessage);
         return;
     }
+
     if (!dataReady)
     {
         Serial.println("Error trying to get data: not ready");
@@ -128,6 +151,7 @@ void loop()
 
     // Display results
     clear();
-    drawInfo(co2Concentration, temperature, relativeHumidity, 1000);
+    drawInfo(co2Concentration, temperature, relativeHumidity, 1000, &datetime);
     show();
 }
+

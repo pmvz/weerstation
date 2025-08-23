@@ -1,6 +1,9 @@
+#include <time.h>
 #include "Adafruit_ThinkInk.h"
 
 ThinkInk_290_Tricolor_Z94 display(PIN_EPD_DC, PIN_EPD_RESET, PIN_EPD_CS, -1, PIN_EPD_BUSY);
+char weekdays[7][3] = { "zo", "ma", "di", "wo", "do", "vr", "za" };
+char months[12][4] = { "jan", "feb", "mar", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "dec" };
 
 struct Cursor
 {
@@ -92,19 +95,21 @@ void drawIcon(char* icon, struct Cursor &cursor)
     drawBitmap(getBitmapIcon(icon), cursor);
 }
 
-void drawInfo(int co2_ppm, float temperature, float rel_humidity, float pressure)
+void drawInfo(int co2_ppm, float temperature, float rel_humidity, float pressure, struct tm* datetime)
 {
     struct Cursor cursor = { 0, 0 };
 
     // Time
     cursor = { 31, 18 };
-    drawStringLarge("24:99", cursor);
+    char buffer[6];
+    strftime(buffer, sizeof(buffer), "%H:%M", datetime);
+    drawStringLarge(buffer, cursor);  // Time
     cursor.x += 12;
-    drawStringLarge("do", cursor);
+    drawStringLarge(weekdays[datetime->tm_wday], cursor);  // Day of the week
     cursor.x += 12;
-    drawStringLarge("31", cursor);
+    drawIntLarge(datetime->tm_mday, cursor);  // Date
     cursor.x += 12;
-    drawStringLarge("feb", cursor);
+    drawStringLarge(months[datetime->tm_mon], cursor);  // Month
 
     // Outside weather
     cursor = { 234, 8 };
