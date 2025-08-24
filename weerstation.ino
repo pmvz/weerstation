@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <esp_netif_sntp.h>
 #include <SPI.h>
 #include <SensirionI2cScd4x.h>
 #include <time.h>
@@ -14,7 +15,6 @@ SensirionI2cScd4x sensorCO2;
 static char errorMessage[64];
 static int16_t error;
 unsigned long last_update_time;
-static struct tm datetime;
 
 
 void PrintUint64(uint64_t& value) {
@@ -85,13 +85,18 @@ void setup() {
     }
     Serial.print(" Connected! IP: ");
     Serial.println(WiFi.localIP());
-    
     delay(1000);
+
+    // Set time from NTP server
+    setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);
+    tzset();
+    esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
+    esp_netif_sntp_init(&config);
+    if (esp_netif_sntp_sync_wait(pdMS_TO_TICKS(60000)) != ESP_OK) {
+        Serial.println("Failed to update system time within 10s timeout");
+    }
+
     retrieveWeatherData();
-    datetime = getDateTime();
-    
-    char datetime_s[64];
-    strftime(datetime_s, sizeof(datetime_s), "%T %w %d %b", &datetime);
 
     // Init display
     initDisplay();
@@ -149,9 +154,15 @@ void loop()
     Serial.print(relativeHumidity);
     Serial.println();
 
+    // Get current time
+    time_t now;
+    struct tm timeinfo;    
+    time(&now);
+    localtime_r(&now, &timeinfo);
+
     // Display results
     clear();
-    drawInfo(co2Concentration, temperature, relativeHumidity, 1000, &datetime);
+    drawInfo(co2Concentration, temperature, relativeHumidity, 1000, &timeinfo);
     show();
 }
 
