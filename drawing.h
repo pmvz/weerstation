@@ -1,5 +1,6 @@
 #include <time.h>
 #include "Adafruit_ThinkInk.h"
+#include "weather.h"
 
 ThinkInk_290_Tricolor_Z94 display(PIN_EPD_DC, PIN_EPD_RESET, PIN_EPD_CS, -1, PIN_EPD_BUSY);
 char weekdays[7][3] = { "zo", "ma", "di", "wo", "do", "vr", "za" };
@@ -113,7 +114,8 @@ void drawInfo(int co2_ppm, float temperature, float rel_humidity, float pressure
 
     // Outside weather
     cursor = { 234, 8 };
-    drawIcon("sunnylightning", cursor);
+    char* weather_icon = getCurrentWeatherIconName();
+    drawIcon(weather_icon, cursor);
 
     // Separator
     display.drawLine(6, 54, 288, 54, EPD_BLACK);

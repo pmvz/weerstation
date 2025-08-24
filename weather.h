@@ -1,3 +1,5 @@
+#pragma once
+
 #include <ArduinoJson.h>
 #include <time.h>
 #include <WiFiClientSecure.h>
@@ -8,7 +10,7 @@ static char buffer[BUFFER_SIZE];  // "probably large enough"
 JsonDocument doc;
 
 
-bool retrieveWeatherData()
+bool updateWeatherData()
 {
     // Connect
     client.setCACert(api_cert);
@@ -109,16 +111,40 @@ bool retrieveWeatherData()
     return true;
 }
 
-
-tm getDateTime()
+char* getCurrentWeatherIconName()
 {
-    struct tm datetime;
-    if (doc["liveweer"][0]["time"].is<const char*>())
-    {
-        strptime(doc["liveweer"][0]["time"], "%d-%m-%Y %T", &datetime);
-    }
-    
-    return datetime;
-}
+    if (!doc["liveweer"][0]["image"].is<const char*>())
+        return "unknown";
 
+    // Poor man's pattern matching
+    const char* image = doc["liveweer"][0]["image"].as<const char*>();
+    if (strcmp(image, "zonnig") == 0)
+        return "sunny";
+    else if (strcmp(image, "lightning") == 0)
+        return "lightning";  // TODO: sunnylightning, nightlightning
+    else if (strcmp(image, "regen") == 0 ||
+             strcmp(image, "buien") == 0 ||
+             strcmp(image, "hagel") == 0)
+        return "rain";
+    else if (strcmp(image, "mist") == 0)
+        return "sunnyfog";  // TODO: fog?
+    else if (strcmp(image, "sneeuw") == 0)
+        return "snow";  // TODO: sunnysnow, nightsnow
+    else if (strcmp(image, "lightbewolkt") == 0 ||
+             strcmp(image, "halfbewolkt") == 0)
+        return "sunnyclouded";  // TODO: nightclouded
+    else if (strcmp(image, "halfbewolkt_regen") == 0)
+        return "sunnyrain";  // TODO: nightrain
+    else if (strcmp(image, "bewolkt") == 0 ||
+             strcmp(image, "zwaarbewolkt") == 0)
+        return "clouded";
+    else if (strcmp(image, "nachtmist") == 0)
+        return "nightfog";  // TODO: fog?
+    else if (strcmp(image, "helderenacht") == 0)
+        return "night";
+    else if (strcmp(image, "nachtbewolkt") == 0)
+        return "nightclouded";
+    else
+        return "unknown";
+}
 
