@@ -146,7 +146,7 @@ void drawInfo(int co2_ppm, float temperature, float rel_humidity, float pressure
     cursor = { 161, 101 };
     drawIcon("pres", cursor);
     cursor = { 184, 99 };
-    drawIntLarge(pressure, cursor);
+    drawFloatLarge(pressure, cursor);
     cursor.x = 249;
     drawStringLarge("kPa", cursor);
 }

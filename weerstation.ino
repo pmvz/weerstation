@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Bme280.h>
 #include <esp_netif_sntp.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/timers.h>
@@ -13,7 +14,8 @@
 #include "weather.h"
 
 
-SensirionI2cScd4x sensorCO2;
+SensirionI2cScd4x sensorSCD40;
+Bme280TwoWire sensorBME280;
 static char errorMessage[64];
 TimerHandle_t measurementTimer;
 TimerHandle_t updateWeatherTimer;
@@ -29,7 +31,9 @@ void setup() {
     // Start serial and sensor
     Serial.begin(115200);
     delay(1000);
-    setupCo2Sensor();
+    Wire.begin();
+    setupSCD40Sensor();
+    setupBME280Sensor();
 
     // Init wifi
     WiFi.mode(WIFI_MODE_STA);
@@ -74,26 +78,25 @@ void setup() {
     return;
 }
 
-void setupCo2Sensor() {
-    Wire.begin();
-    sensorCO2.begin(Wire, I2C_CO2);
+void setupSCD40Sensor() {
+    sensorSCD40.begin(Wire, I2C_CO2);
     delay(30);
 
-    int error = sensorCO2.stopPeriodicMeasurement();
+    int error = sensorSCD40.stopPeriodicMeasurement();
     if (error != 0) {
         Serial.print("Error trying to execute stopPeriodicMeasurement(): ");
         errorToString(error, errorMessage, sizeof errorMessage);
         Serial.println(errorMessage);
     }
 
-    error = sensorCO2.reinit();
+    error = sensorSCD40.reinit();
     if (error != 0) {
         Serial.print("Error trying to execute reinit(): ");
         errorToString(error, errorMessage, sizeof errorMessage);
         Serial.println(errorMessage);
     }
 
-    error = sensorCO2.startPeriodicMeasurement();
+    error = sensorSCD40.startPeriodicMeasurement();
     if (error != 0) {
         Serial.print("Error trying to execute startPeriodicMeasurement(): ");
         errorToString(error, errorMessage, sizeof errorMessage);
@@ -102,13 +105,22 @@ void setupCo2Sensor() {
     }
 }
 
+void setupBME280Sensor() {
+    sensorBME280.begin();  // 0x76
+    sensorBME280.setSettings(Bme280Settings::indoor());
+}
+
 void updateMeasurements() {
     bool dataReady = false;
-    uint16_t co2Concentration = 0;
-    float temperature = 0.0;
-    float relativeHumidity = 0.0;
+    uint16_t co2_SCD40 = 0;
+    float temperature_SCD40 = 0.0;
+    float rel_humidity_SCD40 = 0.0;
+    float pressure_BME280 = 0.0;
+    float temperature_BME280 = 0.0;
+    float rel_humidity_BME280 = 0.0;
 
-    int error = sensorCO2.getDataReadyStatus(dataReady);
+    // Get data from the SCD40 sensor
+    int error = sensorSCD40.getDataReadyStatus(dataReady);
     if (error != 0) {
         Serial.print("Error trying to execute getDataReadyStatus(): ");
         errorToString(error, errorMessage, sizeof(errorMessage));
@@ -121,24 +133,34 @@ void updateMeasurements() {
         return;
     }
 
-    error = sensorCO2.readMeasurement(co2Concentration, temperature, relativeHumidity);
+    error = sensorSCD40.readMeasurement(co2_SCD40, temperature_SCD40, rel_humidity_SCD40);
     if (error != 0) {
         Serial.print("Error trying to execute readMeasurement(): ");
         errorToString(error, errorMessage, sizeof(errorMessage));
         Serial.println(errorMessage);
         return;
     }
+
+    // Get data from the BME280 sensor
+    pressure_BME280 = sensorBME280.getPressure();
+    temperature_BME280 = sensorBME280.getTemperature();
+    rel_humidity_BME280 = sensorBME280.getHumidity();
     
     // Report results via serial
     Serial.print("CO2 concentration [ppm]: ");
-    Serial.print(co2Concentration);
-    Serial.println();
+    Serial.println(co2_SCD40);
     Serial.print("Temperature [deg C]: ");
-    Serial.print(temperature);
-    Serial.println();
+    Serial.print(temperature_SCD40);
+    Serial.print(" (SCD40), ");
+    Serial.print(temperature_BME280);
+    Serial.println(" (BME280)");
     Serial.print("Relative Humidity [RH]: ");
-    Serial.print(relativeHumidity);
-    Serial.println();
+    Serial.print(rel_humidity_SCD40);
+    Serial.print(" (SCD40), ");
+    Serial.print(rel_humidity_BME280);
+    Serial.println(" (BME280)");
+    Serial.print("Pressure [Pa]: ");
+    Serial.println(pressure_BME280);
 
     // Get current time
     time_t now;
@@ -148,7 +170,7 @@ void updateMeasurements() {
 
     // Display results
     clear();
-    drawInfo(co2Concentration, temperature, relativeHumidity, 1000, &timeinfo);
+    drawInfo(co2_SCD40, temperature_SCD40, rel_humidity_SCD40, pressure_BME280 / 1000, &timeinfo);
     show();
 }
 
