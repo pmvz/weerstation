@@ -119,7 +119,7 @@ char* getCurrentWeatherIconName() {
         return "sunnyfog";  // TODO: fog?
     else if (strcmp(image, "sneeuw") == 0)
         return "snow";  // TODO: sunnysnow, nightsnow
-    else if (strcmp(image, "lightbewolkt") == 0 ||
+    else if (strcmp(image, "lichtbewolkt") == 0 ||
              strcmp(image, "halfbewolkt") == 0)
         return "sunnyclouded";  // TODO: nightclouded
     else if (strcmp(image, "halfbewolkt_regen") == 0)
@@ -131,7 +131,8 @@ char* getCurrentWeatherIconName() {
         return "nightfog";  // TODO: fog?
     else if (strcmp(image, "helderenacht") == 0)
         return "night";
-    else if (strcmp(image, "nachtbewolkt") == 0)
+    else if (strcmp(image, "nachtbewolkt") == 0 ||
+             strcmp(image, "wolkennacht") == 0)  // Undocumented API value
         return "nightclouded";
     else
         return "unknown";
