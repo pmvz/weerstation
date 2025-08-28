@@ -109,7 +109,7 @@ char* getCurrentWeatherIconName() {
     const char* image = doc["liveweer"][0]["image"].as<const char*>();
     if (strcmp(image, "zonnig") == 0)
         return "sunny";
-    else if (strcmp(image, "lightning") == 0)
+    else if (strcmp(image, "bliksem") == 0)
         return "lightning";  // TODO: sunnylightning, nightlightning
     else if (strcmp(image, "regen") == 0 ||
              strcmp(image, "buien") == 0 ||
